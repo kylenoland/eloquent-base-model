@@ -1,4 +1,4 @@
-<?php
+<?php namespace KyleNoland\EloquentBaseModel;
 
 use Eloquent;
 
