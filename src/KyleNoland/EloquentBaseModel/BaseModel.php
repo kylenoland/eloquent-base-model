@@ -172,4 +172,29 @@ class BaseModel extends Eloquent
 	{
 		return ! empty($this->numericAttributes);
 	}
+
+
+	/**
+	 * Get an array of drop down menu options
+	 *
+	 * @param string $valueColumn
+	 * @param string $textColumn
+	 *
+	 * @return array
+	 */
+	public static function getDdlOptions($valueColumn = 'id', $textColumn = 'name')
+	{
+		$instance = new static;
+
+		$models = $instance->newQuery()->get();
+
+		$options = array();
+
+		foreach($models as $model)
+		{
+			$options[$model->getAttribute($valueColumn)] = $model->getAttribute($textColumn);
+		}
+
+		return $options;
+	}
 }
