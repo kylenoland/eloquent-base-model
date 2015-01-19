@@ -61,6 +61,38 @@ class BaseModel extends Eloquent
 
 
 	/**
+	 * Optional placeholder value and text when generating DDL option arrays
+	 *
+	 * @var array
+	 */
+	protected static $ddlPlaceholder = array();
+
+
+	/**
+	 * Static class instance
+	 *
+	 * @var mixed
+	 */
+	protected static $_instance = null;
+
+
+	/**
+	 * Get an instance of this class
+	 *
+	 * @return mixed|static
+	 */
+	private static function getInstance()
+	{
+		if(is_null(self::$_instance))
+		{
+			self::$_instance = new static;
+		}
+
+		return self::$_instance;
+	}
+
+
+	/**
 	 * Get the created_at attribute
 	 *
 	 * @param string $format
@@ -184,11 +216,18 @@ class BaseModel extends Eloquent
 	 */
 	public static function getDdlOptions($valueColumn = 'id', $textColumn = 'name')
 	{
-		$instance = new static;
+		$instance = self::getInstance();
 
 		$models = $instance->newQuery()->get();
 
 		$options = array();
+
+		if( ! empty(self::$ddlPlaceholder))
+		{
+			$options = self::$ddlPlaceholder;
+
+			self::$ddlPlaceholder = array();
+		}
 
 		foreach($models as $model)
 		{
@@ -196,5 +235,39 @@ class BaseModel extends Eloquent
 		}
 
 		return $options;
+	}
+
+
+	/**
+	 * Add a placeholder drop down menu option
+	 *
+	 * @param      $label
+	 * @param null $value
+	 *
+	 * @return BaseModel|mixed
+	 */
+	public static function withPlaceholder($label, $value = null)
+	{
+		self::$ddlPlaceholder[$value] = $label;
+
+		return self::getInstance();
+	}
+
+
+	/**
+	 * Add one or more placeholder drop down menu options
+	 *
+	 * @param array $placeholders
+	 *
+	 * @return BaseModel|mixed
+	 */
+	public static function withPlaceholders(array $placeholders)
+	{
+		foreach($placeholders as $label => $value)
+		{
+			self::withPlaceholder($label, $value);
+		}
+
+		return self::getInstance();
 	}
 }
